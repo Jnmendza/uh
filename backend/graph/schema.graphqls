@@ -1,0 +1,167 @@
+# GraphQL Schema for Union Hub
+
+enum OrganizationType {
+    umbrella
+    sub_group
+    standalone
+}
+
+enum AuthProvider {
+    email
+    google
+}
+
+enum GlobalRole {
+    super_admin
+    user
+}
+
+enum Role {
+    tenant_admin
+    moderator
+    member
+}
+
+enum MembershipStatus {
+    active
+    pending
+    expired
+}
+
+enum PaymentStatus {
+    paid
+    unpaid
+}
+
+type Branding {
+    logoUrl: String!
+    primaryColor: String!
+    secondaryColor: String!
+}
+
+type Settings {
+    followedClubId: String!
+    followedLeagueId: String!
+}
+
+type Organization {
+    id: ID!
+    name: String!
+    type: OrganizationType!
+    parentId: ID
+    subdomain: String!
+    branding: Branding!
+    settings: Settings!
+    createdAt: String!
+    updatedAt: String!
+}
+
+type User {
+    id: ID!
+    email: String!
+    firstName: String!
+    lastName: String!
+    avatarUrl: String!
+    authProvider: AuthProvider!
+    globalRole: GlobalRole!
+    createdAt: String!
+}
+
+type MembershipTier {
+    id: ID!
+    organizationId: ID!
+    name: String!
+    price: Float!
+    benefits: [String!]!
+    isActive: Boolean!
+}
+
+type Membership {
+    id: ID!
+    userId: ID!
+    organizationId: ID!
+    tierId: ID!
+    role: Role!
+    status: MembershipStatus!
+    paymentStatus: PaymentStatus!
+    joinedAt: String!
+    expiresAt: String
+}
+
+type Channel {
+    id: ID!
+    organizationId: ID!
+    name: String!
+    allowedTiers: [ID!]!
+    allowedRoles: [Role!]!
+}
+
+type Message {
+    id: ID!
+    channelId: ID!
+    senderId: ID!
+    content: String!
+    isPinned: Boolean!
+    createdAt: String!
+}
+
+type Event {
+    id: ID!
+    organizationId: ID!
+    title: String!
+    description: String!
+    location: String!
+    date: String!
+    fixtureId: String
+    visibilityTiers: [ID!]!
+}
+
+input CreateOrganizationInput {
+    name: String!
+    type: OrganizationType!
+    parentId: ID
+    subdomain: String!
+    logoUrl: String
+    primaryColor: String
+    secondaryColor: String
+    followedClubId: String
+    followedLeagueId: String
+}
+
+input CreateUserInput {
+    email: String!
+    firstName: String!
+    lastName: String!
+    authProvider: AuthProvider!
+    avatarUrl: String
+    globalRole: GlobalRole
+}
+
+input CreateMembershipTierInput {
+    organizationId: ID!
+    name: String!
+    price: Float!
+    benefits: [String!]
+    isActive: Boolean
+}
+
+input CreateMembershipInput {
+    userId: ID!
+    organizationId: ID!
+    tierId: ID!
+    role: Role!
+    status: MembershipStatus!
+    paymentStatus: PaymentStatus!
+}
+
+type Query {
+    organization(id: ID!): Organization
+    users: [User!]!
+}
+
+type Mutation {
+    createOrganization(input: CreateOrganizationInput!): Organization!
+    createUser(input: CreateUserInput!): User!
+    createMembershipTier(input: CreateMembershipTierInput!): MembershipTier!
+    createMembership(input: CreateMembershipInput!): Membership!
+}
